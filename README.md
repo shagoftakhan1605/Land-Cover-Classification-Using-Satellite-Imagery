@@ -11,8 +11,7 @@ The process involves multiple steps including data preprocessing, feature extrac
 ![Screenshot (668)](https://github.com/user-attachments/assets/0becb131-7549-432c-979e-b9cbf7e3ce53)
 
 ### Predictions
-![Screenshot (670)](https://github.com/user-attachments/assets/13769d21-6b69-4da2-ae3c-0fa513872040)
-
+![Screenshot (669)](https://github.com/user-attachments/assets/b855cd88-63de-4311-ae00-994e1336787f)
 
 ## **Data Source**
 
