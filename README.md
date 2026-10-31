@@ -4,7 +4,15 @@
 
 This project implements a land cover classification system using Landsat 9 satellite imagery and a Random Forest classifier within Google Earth Engine (GEE). The classification distinguishes between three key land cover types: forests, urban areas, and barren land. The project is essential for understanding land use patterns, monitoring environmental changes, and aiding in sustainable development practices.
 
-The process involves multiple steps including data preprocessing, feature extraction, model training, classification, and accuracy assessment, all conducted in the cloud-based GEE platform. This document outlines each step and provides detailed explanations of the code, showcasing expertise in remote sensing, machine learning, and environmental data analysis.
+The process involves data preprocessing, feature extraction, model training, classification and accuracy assessment, all in the cloud-based GEE platform.
+
+**Study area:** a rectangle covering Sheffield and Rotherham, UK (about 53.28 to 53.46 N, 1.24 to 1.67 W).
+
+**Files**
+* `classification_datapoints.js`: the study area (`roi`) and the labelled training points (200 each for forest, urban and barren)
+* `land_cover_classification.js`: the classification script
+
+**How to run:** open the [GEE Code Editor](https://code.earthengine.google.com/), paste `classification_datapoints.js` followed by `land_cover_classification.js` into one script, and click Run. The confusion matrix and accuracies are printed in the Console.
 
 ## **Results**
 ### Preparing the dataset
@@ -54,7 +62,7 @@ var rescaledDataset = dataset.map(applyScaleFactors);
 Landsat 9 data is provided as digital numbers (DN) which need to be converted into physically meaningful units. This function `applyScaleFactors` performs the conversion:
 
 - **Optical Bands:** Convert DN to surface reflectance using a scaling factor and offset.
-- **Thermal Band:** Convert DN to brightness temperature (in Kelvin) using another scaling factor and offset.
+- **Thermal Band:** Convert DN to surface temperature (in Kelvin) using another scaling factor and offset.
   
 The function is applied across the entire dataset using `map`, ensuring all images in the collection are rescaled.
 
@@ -149,16 +157,16 @@ A Random Forest classifier with 10 trees is trained on the training set. Random 
 var classified = input.classify(classifier);
 
 var landcoverPalette = [
+  '#005a32', // forest (0)
   '#e31a1c', // urban (1)
-  '#005a32', // forest (2)
-  '#FF8000', // agri (3)
+  '#FF8000', // barren (2)
 ]; 
 
 Map.addLayer(classified.clip(roi), 
-  {palette: landcoverPalette, min: 0, max: 3}, 'Land Cover Classification');
+  {palette: landcoverPalette, min: 0, max: 2}, 'Land Cover Classification');
 ```
 
-The trained classifier is used to classify the input image, producing a thematic land cover map. The classified image is visualized with a custom color palette, making it easy to distinguish between different land cover types.
+The trained classifier is used to classify the input image, producing a thematic land cover map. The classified image is visualized with one colour per class: green for forest, red for urban and orange for barren.
 
 ### **11. Accuracy Assessment**
 
@@ -177,9 +185,18 @@ print('Consumers Accuracy:', confusionMatrix.consumersAccuracy());
 
 The model's accuracy is assessed by generating a confusion matrix, which compares the predicted land cover classes against the actual classes in the test set. Key metrics such as overall accuracy, producer’s accuracy (recall), and consumer’s accuracy (precision) are computed to evaluate the model’s performance.
 
+Accuracy values are printed in the GEE Console when the script runs; they are not recorded in this repository yet.
+
+## **Fixes and Limitations**
+
+* **Fixed:** the urban training points were labelled with a misspelt property (`Claa` instead of `Class`), so they carried no label and urban was not learned. All 200 urban points now use `Class: 1`.
+* **Fixed:** the display palette did not match the class numbers (forest was drawn in red) and used a 0 to 3 range for 3 classes.
+* Training and test points come from the same hand-picked locations, split at random. Nearby points can be very similar, so accuracy may be optimistic.
+* Only 10 trees are used in the Random Forest, and SR_B6 and the thermal band are not used as features.
+
 ## **Conclusion**
 
-This project illustrates the application of remote sensing and machine learning techniques to land cover classification using Google Earth Engine. The steps outlined—from data preprocessing to accuracy assessment—demonstrate a methodical approach to solving complex environmental problems using state-of-the-art tools and techniques.
+This project illustrates the application of remote sensing and machine learning techniques to land cover classification using Google Earth Engine. It covers the full workflow from image preprocessing to accuracy assessment.
 
 ## **Future Work**
 
@@ -193,7 +210,3 @@ Potential future improvements and extensions include:
 
 - [Google Earth Engine Documentation](https://developers.google.com/earth-engine)
 - [Landsat 9 Overview](https://www.usgs.gov/landsat-missions/landsat-9)
-
----
-
-This README file offers a detailed explanation of the code, clarifies the methodology, and showcases the depth of knowledge required to execute such a project effectively.
