@@ -66,16 +66,16 @@ var classifier = ee.Classifier.smileRandomForest(10)
 // Classify the input image using the trained classifier
 var classified = input.classify(classifier);
 
-// Define a palette for the classification
+// Define a palette for the classification (index = class value)
 var landcoverPalette = [
+  '#005a32', // forest (0)
   '#e31a1c', // urban (1)
-  '#005a32', // forest (2)
-  '#FF8000', // agri (3)
+  '#FF8000', // barren (2)
 ]; 
 
 // Display the classified map
 Map.addLayer(classified.clip(roi), 
-  {palette: landcoverPalette, min: 0, max: 3}, 'Land Cover Classification');
+  {palette: landcoverPalette, min: 0, max: 2}, 'Land Cover Classification');
 
 // Accuracy Assessment
 
